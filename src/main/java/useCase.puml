@@ -23,7 +23,7 @@ skinparam note {
   BorderColor #D4AC0D
 }
 
-title Diagramme de Cas d'Utilisation — Gestion des Inscriptions
+title Diagramme de Cas d'Utilisation - Gestion des Inscriptions
 
 actor "Étudiant"       as Etudiant
 actor "Agent Scolarité" as Agent
