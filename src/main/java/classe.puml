@@ -1,0 +1,96 @@
+@startuml Sequence_GestionInscription
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam sequenceArrowThickness 1.5
+skinparam backgroundColor #FFFFFF
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 160
+
+skinparam sequence {
+  ParticipantBackgroundColor #EAF2F8
+  ParticipantBorderColor #2E4053
+  ParticipantFontColor #1B2631
+  ActorBackgroundColor #EAF2F8
+  ActorBorderColor #2E4053
+  LifeLineBorderColor #85929E
+  LifeLineBackgroundColor #F4F6F6
+  ArrowColor #2E4053
+  ArrowFontColor #1B2631
+  DividerBackgroundColor #FDEBD0
+  DividerBorderColor #D4AC0D
+  BoxBorderColor #85929E
+  BoxBackgroundColor #FDFEFE
+}
+skinparam ActivationBackgroundColor #AED6F1
+skinparam ActivationBorderColor #2E4053
+
+autoactivate on
+title Diagramme de Séquence — Processus d'Inscription (avec scénarios alternatifs)
+
+actor "Étudiant" as Etudiant
+boundary "Interface Système" as UI
+control "Gestionnaire Inscription" as Ctrl
+database "Base de Données" as DB
+actor "Système Paiement" as SysPaiement
+actor "Agent Scolarité" as Agent
+
+== Phase 1 : Constitution du Dossier ==
+
+Etudiant -> UI : Saisir infos personnelles & pièces
+UI -> Ctrl : creerDossier(infos, pieces)
+Ctrl -> DB : Sauvegarder dossier (Statut: En cours)
+DB --> Ctrl : Confirmation
+Ctrl --> UI : Dossier créé avec succès
+UI --> Etudiant : Demande de choix de formation
+
+== Phase 2 : Choix de Formation & Paiement ==
+
+Etudiant -> UI : Sélectionner la formation
+UI -> Ctrl : associerFormation(codeFormation)
+Ctrl -> DB : Récupérer montant frais
+DB --> Ctrl : Montant (Double)
+Ctrl --> UI : Afficher le montant des frais
+Etudiant -> UI : Valider et choisir mode de paiement
+UI -> Ctrl : initierPaiement(montant)
+Ctrl -> SysPaiement : Traiter transaction financière
+
+alt Scénario nominal : paiement réussi
+    SysPaiement --> Ctrl : Transaction Réussie (Ref: XYZ)
+    Ctrl -> DB : Enregistrer Paiement & Passer dossier à "En attente de validation"
+    DB --> Ctrl : OK
+    Ctrl -> UI : Notification: Paiement reçu, en attente de la scolarité
+    UI --> Etudiant : Statut mis à jour
+else Scénario alternatif : paiement échoué
+    SysPaiement --> Ctrl : Transaction Échouée (motif)
+    Ctrl -> DB : Enregistrer Paiement (Statut: Échoué)
+    DB --> Ctrl : OK
+    Ctrl -> UI : Notification: Échec du paiement
+    UI --> Etudiant : Veuillez réessayer / choisir un autre mode
+end
+
+== Phase 3 : Validation Scolarité ==
+
+Agent -> UI : Consulter la liste des dossiers "En attente"
+UI -> Ctrl : recupererDossiersEnAttente()
+Ctrl -> DB : Select * where statut='En attente'
+DB --> Ctrl : Liste dossiers
+Ctrl --> UI : Afficher dossiers
+UI --> Agent : Liste affichée
+
+alt Scénario nominal : dossier validé
+    Agent -> UI : Cliquer sur "Valider l'inscription"
+    UI -> Ctrl : validerDossier(idDossier)
+    Ctrl -> DB : Update statut='Inscrit'
+    DB --> Ctrl : OK
+    Ctrl -> UI : Inscription validée
+    UI --> Etudiant : Notification / Email d'inscription réussie
+else Scénario alternatif : dossier rejeté
+    Agent -> UI : Cliquer sur "Rejeter le dossier" (motif)
+    UI -> Ctrl : rejeterDossier(idDossier, motif)
+    Ctrl -> DB : Update statut='Rejeté'
+    DB --> Ctrl : OK
+    Ctrl -> UI : Dossier rejeté
+    UI --> Etudiant : Notification / Email de rejet avec motif
+end
+
+@enduml

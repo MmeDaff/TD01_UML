@@ -1,0 +1,89 @@
+@startuml UseCase_GestionInscription
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundCorner 12
+skinparam nodesep 40
+skinparam ranksep 90
+skinparam backgroundColor #FFFFFF
+
+skinparam actor {
+  BackgroundColor #EAF2F8
+  BorderColor #2E4053
+  FontColor #1B2631
+}
+skinparam usecase {
+  BackgroundColor #EAF2F8
+  BorderColor #2E4053
+  FontColor #1B2631
+  ArrowColor #5D6D7E
+}
+skinparam note {
+  BackgroundColor #FEF9E7
+  BorderColor #D4AC0D
+}
+
+title Diagramme de Cas d'Utilisation — Gestion des Inscriptions
+
+actor "Étudiant"       as Etudiant
+actor "Agent Scolarité" as Agent
+actor "Système Paiement" as SysPaiement
+
+rectangle "Système de Gestion des Inscriptions" {
+  usecase "Créer un dossier"                as UC1
+  usecase "Choisir une formation"           as UC2
+  usecase "Payer les frais"                 as UC3
+  usecase "Consulter son statut"            as UC4
+  usecase "Annuler l'inscription"           as UC8
+  usecase "Valider l'inscription"           as UC5
+  usecase "Rejeter le dossier"              as UC6
+  usecase "Authentification"                as UCAuth #E74C3C;line:8B0000;text:white
+  usecase "Recevoir notification par email" as UC7
+}
+
+' ---- Étudiant : cas d'utilisation regroupés dans l'ordre du flux ----
+Etudiant -- UC1
+Etudiant -- UC2
+Etudiant -- UC3
+Etudiant -- UC4
+Etudiant -- UC8
+
+' ---- Agent scolarité ----
+Agent -- UC5
+Agent -- UC6
+
+' ---- Inclusions vers Authentification (regroupées, moins de croisements) ----
+UC1 ..> UCAuth : <<include>>
+UC2 ..> UCAuth : <<include>>
+UC3 ..> UCAuth : <<include>>
+UC4 ..> UCAuth : <<include>>
+UC5 ..> UCAuth : <<include>>
+UC6 ..> UCAuth : <<include>>
+
+' ---- Paiement externe ----
+UC3 -- SysPaiement
+UCAuth ..> SysPaiement : <<extend>>
+
+' ---- Extensions (scénarios alternatifs) ----
+UC5 ..> UC7 : <<extend>>
+UC6 ..> UC7 : <<extend>>
+UC8 ..> UC7 : <<extend>>
+
+note right of UCAuth
+  Scénario nominal : après authentification,
+  l'étudiant est redirigé vers le système
+  de paiement (service comptable).
+end note
+
+note bottom of UC6
+  Scénario alternatif : pièces incomplètes
+  ou invalides → dossier rejeté, motif
+  transmis à l'étudiant.
+end note
+
+note bottom of UC7
+  Notification envoyée par email
+  à chaque changement de statut.
+end note
+
+@enduml
