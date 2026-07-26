@@ -1,4 +1,4 @@
-# TD01_UML — Système de Gestion des Inscriptions
+# TD01_UML - Système de Gestion des Inscriptions
 
 Projet de modélisation UML réalisé dans le cadre du TD de Génie Logiciel (Master 1 GL — UASZ).
 Il couvre la modélisation complète d'un **système de gestion des inscriptions universitaires** : cas d'utilisation, diagramme de classes, diagramme de séquence, description textuelle, user stories et implémentation Java des classes du domaine.
@@ -7,10 +7,9 @@ Il couvre la modélisation complète d'un **système de gestion des inscriptions
 
 | Membre |
 |---|
-| Medoune Massaly |
-| Abdoul Aziz Sy |
-| Halimatou Balde |
-| Mariama Keso Dia |
+| Medoune Massaly |  | Abdoul Aziz Sy |
+| Halimatou Balde |  | Mariama Kesso Dia |
+
 
 ## 📁 Structure du projet
 
